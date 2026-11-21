@@ -71,6 +71,26 @@ instead" with "Rocq checked it" for the lines every other wall depends on.
 2. The gatekeeper can't be a single-threaded static binary small enough for the pipeline, or
    ends up no smaller than what it guards.
 
+## Re-scoped after Heat (Nick, 2026-11-21 18:31): option C
+
+Falsifier 1 fired (RESEARCH.md): Theorem's `rocq-linux-process-semantics` marks AF_UNIX
+streams, `SO_PEERCRED` and `SCM_RIGHTS` unmodeled, holds one process, has no fd-passing
+event, and pins Linux 6.18.46 with Sv48. Of the four ways on (stop; prove only the pure
+decision; extend the model; re-ore on an airlock-protocol proof), Nick chose to **extend the
+model**.
+
+The candidate is now: **the smallest extension to Theorem's Linux process model that makes a
+peer-credential gatekeeper provable**, built so it could go upstream. The gatekeeper stays as
+the motivating client, and its shape may change if a different gatekeeper needs a smaller
+extension. What would prove this slag: the smallest extension that serves a real gatekeeper
+still has to rework invariants the model's existing proofs rest on (the "no fd in flight"
+assumption in State.v), at a size no outside contributor could land; or Theorem doesn't take
+outside changes to the model.
+
+Why this is not a silent re-forge: the first candidate was not invalidated by a strike; its
+own named falsifier fired at Heat, and the forge said in advance where it would go next.
+Nick picked the branch.
+
 ## Scout memory
 
 `enspyrco/intersyntactic/docs/crucible/harness-capability/TEMPER.md` (unanimous RECAST,
