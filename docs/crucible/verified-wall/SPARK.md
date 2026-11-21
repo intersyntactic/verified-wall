@@ -117,3 +117,19 @@ the seam:
 
 **Oh, of course:** systemd opens the doors, each door gets its own keeper, and the proof covers
 only the moment a keeper lets someone through.
+
+### Correction to the fusion (2026-11-21 18:43, from Nick's question "systemd itself isn't proven?")
+
+The fusion assumed systemd hands each doorkeeper "one connected socket to its service". systemd
+socket units create **listening** sockets; they do not connect one program to another. So the
+fusion borrowed a capability systemd doesn't have.
+
+Corrected shape: **the service connects to its doorkeeper.** Each doorkeeper is handed two
+listening sockets: one for callers and one for its service. When the service connects, the
+doorkeeper reads that connection's uid with the same `SO_PEERCRED` and takes it as its outbox
+only if it is the service's own uid. This needs no call beyond `accept` and `SO_PEERCRED`, which
+the extension already models, and it moves systemd mostly out of the trusted base: systemd's
+remaining job is "create two listening sockets", and if it gets that wrong the doorkeeper sees a
+wrong uid and refuses, rather than trusting the setup. What stays trusted is the kernel's answer
+to "who connected?", which the proof assumes regardless. (Open for Cast: what the doorkeeper
+does with callers before its service has connected, and when the service reconnects.)
